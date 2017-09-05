@@ -1,0 +1,87 @@
+﻿@using CIB.Exchange.Model
+@model IEnumerable<CIB.Exchange.Model.Order>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row"  style="margin: 20px 0 20px 0">
+    <form class="form-inline" method="post" autocomplete="off" novalidate="novalidate" asp-action="NewOrder">
+        <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+            <select class="form-control" id="exchange" name="exchange">
+                <option>Kraken</option>
+                <option>CEX</option>
+            </select>
+        </div>
+        <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+            <select class="form-control" name="side">
+                <option>Buy</option>
+                <option>Sell</option>
+            </select>
+        </div>
+            <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                <input placeholder="Amount" tabindex="1" type="text" autocomplete="off" value="" name="volume">
+                <select class="form-control input-group-addon" name="currency">
+                    <option>BTC</option>
+                    <option>ETH</option>
+                    <option>LTC</option>
+                </select>
+            </div>
+            <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                <div class="input-group">
+                    <input type="text" placeholder="Price" value="" name="price" autocomplete="off" aria-describedBy="price">
+                    <span class="input-group-addon" id="price">EUR</span>
+                </div>
+            </div>
+        <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+            <select class="form-control" name="type">
+                <option>Market</option>
+                <option>Limit</option>
+            </select>
+        </div>
+            <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                <span class="">
+                    <button autocomplete="off" type="submit" class="btn btn-success">
+                        <span>Send order</span>
+                    </button>
+                </span>
+            </div>
+    </form>
+</div>
+
+<div class="row">
+    <div class="table-responsive">
+        <table class="table table-striped ">
+            <tr>
+                <th>Exchange</th>
+                <th>Order Id</th>
+                <th>Exchange Order Id</th>
+                <th>Type</th>
+                <th>Pair</th>
+                <th>Price</th>
+                <th>Volume</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.Exchange</td>
+                    <td>@order.Id</td>
+                    <td>@order.ExchangeOrderId</td>
+                    <td>@order.Side/@order.Type</td>
+                    <td>@order.Pair</td>
+                    <td>@order.Price</td>
+                    <td>@order.Volume</td>
+                    <td>@order.State</td>
+                    <td>
+                        @if (order.State == OrderState.AcceptedByExchange)
+                        {
+                            <a asp-action="Cancel" asp-route-orderid="@order.Id">X</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

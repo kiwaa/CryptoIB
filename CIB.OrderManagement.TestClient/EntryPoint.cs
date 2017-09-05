@@ -6,7 +6,6 @@ using CIB.Exchange;
 using CIB.Exchange.Cexio;
 using CIB.Exchange.Kraken;
 using CIB.Exchange.Model;
-using CIB.OrderManagement;
 using Microsoft.Extensions.Configuration;
 
 namespace CIB.OrderManagement.TestClient

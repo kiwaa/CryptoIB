@@ -54,9 +54,16 @@ namespace CIB.Exchange.Cexio
                     await Authorize();
                     break;
                 case "auth":
-                    foreach (var ticker in _tickers)
-                        await SubscribeToOrderBook(ticker);
-                    await RequestBalance();
+                    if (wrapper.ok == "ok")
+                    {
+                        foreach (var ticker in _tickers)
+                            await SubscribeToOrderBook(ticker);
+                        await RequestBalance();
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
                     break;
                 case "ping":
                     await Pong();

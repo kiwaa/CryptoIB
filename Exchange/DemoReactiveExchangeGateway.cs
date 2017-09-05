@@ -106,7 +106,21 @@ namespace CIB.Exchange
 
         public void CancelOrder(Order order)
         {
-            throw new NotImplementedException();
+            var balance = _balanceSubject.Value;
+
+            if (order.Side == Side.Ask)
+            {
+                AddToBalance(balance, order.Pair.Base, order.Volume);
+                AddToBalance(balance, order.Pair.Quote, -order.Price * order.Volume);
+            }
+            else
+            {
+                AddToBalance(balance, order.Pair.Base, -order.Volume);
+                AddToBalance(balance, order.Pair.Quote, order.Price * order.Volume);
+            }
+            VerifyBalance(balance);
+            _balanceSubject.OnNext(balance);
+            _orderSubject.OnNext(new OrderStatus(order.Id, order.ExchangeOrderId, true, true));
         }
     }
 }
