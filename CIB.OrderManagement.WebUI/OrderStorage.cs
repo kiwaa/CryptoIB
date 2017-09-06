@@ -4,7 +4,7 @@ using CIB.Exchange.Model;
 
 namespace CIB.OrderManagement.WebUI
 {
-    internal class OrderStorage
+    public class OrderStorage
     {
         private List<Order> _list = new List<Order>();
 

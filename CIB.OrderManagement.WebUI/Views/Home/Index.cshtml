@@ -76,6 +76,11 @@
                 appendLine(order);
             });
 
+        connection.on('Update',
+            (order) => {
+                replaceLine(order);
+            });
+
         connection.on('List',
             (orders) => {
                 console.log(orders);
@@ -102,7 +107,7 @@
 
         function appendLine(order) {
 
-            var tr = $("<tr/>").append(
+            var tr = $("<tr/>").attr("id", "order-" + order.Id).append(
                 $("<td/>").text(order.Id),
                 $("<td/>").text(order.Exchange),
                 $("<td/>").text(order.ExchangeOrderId),
@@ -113,6 +118,21 @@
                 $("<td/>").text(order.State)
             );
             $("#orders").append(tr);
+        };
+
+        function replaceLine(order) {
+
+            var tr = $("<tr/>").attr("id", "order-" + order.Id).append(
+                $("<td/>").text(order.Id),
+                $("<td/>").text(order.Exchange),
+                $("<td/>").text(order.ExchangeOrderId),
+                $("<td/>").text(order.Currency + "/EUR"),
+                $("<td/>").text(order.Side + "/" + order.Type),
+                $("<td/>").text(order.Volume),
+                $("<td/>").text(order.Price),
+                $("<td/>").text(order.State)
+            );
+            $("#order-" + order.Id).replaceWith(tr);
         };
 
     </script>

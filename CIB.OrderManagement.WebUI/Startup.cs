@@ -39,17 +39,8 @@ namespace CIB.OrderManagement.WebUI
             services.AddSignalR(options => options.JsonSerializerSettings = settings);
             services.AddMvc();
 
-            
-            //var settings = new JsonSerializerSettings();
-            //settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-
-            //var serializer = JsonSerializer.Create(settings);
-            //services.Add(new ServiceDescriptor(typeof(JsonSerializer),
-            //             provider => serializer,
-            //             ServiceLifetime.Transient));
-
-
             services.AddSingleton<IOrderManagement>(s => new OrderManagementS(GetRoutes()));
+            services.AddSingleton(s => new OrderStorage());
         }
 
         private IDictionary<string, IReactiveExchangeGateway> GetRoutes()

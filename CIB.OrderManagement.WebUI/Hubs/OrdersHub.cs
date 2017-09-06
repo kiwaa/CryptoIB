@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CIB.Exchange.Model;
 using CIB.OrderManagement.WebUI.Dto;
@@ -11,15 +12,16 @@ namespace CIB.OrderManagement.WebUI.Hubs
         private readonly IOrderManagement _management;
         private readonly OrderStorage _storage;
 
-        public OrdersHub(IOrderManagement management)
+        public OrdersHub(IOrderManagement management, OrderStorage storage)
         {
             _management = management;
-            _storage = new OrderStorage();
+            _storage = storage;
         }
 
         public override async Task OnConnectedAsync()
-        {            
-            await Clients.Client(Context.ConnectionId).InvokeAsync("List", _storage.GetAll());
+        {
+            var orderDtos = _storage.GetAll().Select(OrderDto.FromDomain);
+            await Clients.Client(Context.ConnectionId).InvokeAsync("List", orderDtos);
             await base.OnConnectedAsync();
         }
 
@@ -42,7 +44,8 @@ namespace CIB.OrderManagement.WebUI.Hubs
 
         private async void OnNewState(Order order)
         {
-            await Clients.All.InvokeAsync("New", OrderDto.FromDomain(order));
+            var method = order.State == OrderState.New ? "New" : "Update";
+            await Clients.All.InvokeAsync(method, OrderDto.FromDomain(order));
         }
 
     }
