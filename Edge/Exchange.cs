@@ -114,14 +114,14 @@ namespace CIB.Edge
         
         public void SendSellOrder(CurrencyPair ticker, decimal volume, decimal price)
         {
-            var order = new Order(ticker, Side.Ask, volume, OrderType.Limit, price);
+            var order = new Order(ticker, Side.Sell, volume, OrderType.Limit, price);
             Log.Info("Send Order " + order.Pair.Ticker + " " + order.Volume + " @ " + order.Price);
             _gateway.AddOrder(order);
         }
 
         public void SendBuyOrder(CurrencyPair ticker, decimal volumeLong, decimal limPriceLong)
         {
-            var order = new Order(ticker, Side.Bid, volumeLong, OrderType.Limit, limPriceLong);
+            var order = new Order(ticker, Side.Buy, volumeLong, OrderType.Limit, limPriceLong);
             Log.Info("Send Order " + order.Pair.Ticker + " " + order.Volume + " @ " + order.Price);
             _gateway.AddOrder(order);
         }

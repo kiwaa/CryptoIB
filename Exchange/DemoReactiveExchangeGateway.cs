@@ -40,7 +40,7 @@ namespace CIB.Exchange
         {
             var balance = _balanceSubject.Value;
 
-            if (order.Side == Side.Bid)
+            if (order.Side == Side.Buy)
             {
                 AddToBalance(balance, order.Pair.Base, order.Volume);
                 AddToBalance(balance, order.Pair.Quote, -order.Price * order.Volume);
@@ -108,7 +108,7 @@ namespace CIB.Exchange
         {
             var balance = _balanceSubject.Value;
 
-            if (order.Side == Side.Ask)
+            if (order.Side == Side.Sell)
             {
                 AddToBalance(balance, order.Pair.Base, order.Volume);
                 AddToBalance(balance, order.Pair.Quote, -order.Price * order.Volume);

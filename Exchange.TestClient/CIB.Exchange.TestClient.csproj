@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Exchange\CIB.Exchange.csproj" />
-    <ProjectReference Include="..\KrakenGateway\CIB.Exchange.csproj" />
   </ItemGroup>
 
 </Project>

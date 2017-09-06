@@ -27,11 +27,11 @@ namespace CIB.OrderManagement.Tests
             var sut = new OrderManagementS(route);
 
             // act
-            var order = sut.Create("Test", TestPair, Side.Bid, 1, OrderType.Limit, 100);
+            var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
 
             // assert
             Assert.AreEqual(TestPair, order.Pair);
-            Assert.AreEqual(Side.Bid, order.Side);
+            Assert.AreEqual(Side.Buy, order.Side);
             Assert.AreEqual(1m, order.Volume);
             Assert.AreEqual(OrderType.Limit, order.Type);
             Assert.AreEqual(100m, order.Price);

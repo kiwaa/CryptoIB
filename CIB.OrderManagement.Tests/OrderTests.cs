@@ -20,7 +20,7 @@ namespace CIB.OrderManagement.Tests
             var exchange = "Test";
             var fixture = new Fixture();
             var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, Guid.NewGuid().ToString(), true));
-            var order = sut.Create(exchange, TestPair, Side.Bid, 1, OrderType.Limit, 100);
+            var order = sut.Create(exchange, TestPair, Side.Buy, 1, OrderType.Limit, 100);
 
             // act
             order.Send();
@@ -36,7 +36,7 @@ namespace CIB.OrderManagement.Tests
             var exchange = "Test";
             var fixture = new Fixture();
             var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, "No"));
-            var order = sut.Create("Test", TestPair, Side.Bid, 1, OrderType.Limit, 100);
+            var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
 
             // act
             order.Send();
@@ -55,7 +55,7 @@ namespace CIB.OrderManagement.Tests
             var sut = fixture.CreateSut(exchange, 
                 id => new OrderStatus(id, Guid.NewGuid().ToString(), true),
                 (id, eid) => new OrderStatus(id, eid, true, true));
-            var order = sut.Create("Test", TestPair, Side.Bid, 1, OrderType.Limit, 100);
+            var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
             order.Send();
 
             // act
@@ -73,7 +73,7 @@ namespace CIB.OrderManagement.Tests
             var exchange = "Test";
             var fixture = new Fixture();
             var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, Guid.NewGuid().ToString(), true));
-            var order = sut.Create("Test", TestPair, Side.Bid, 1, OrderType.Limit, 100);
+            var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
             order.StateNotifications().Subscribe(state => wasCalled = true);
             
             // act

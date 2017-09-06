@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using CIB.Exchange;
 using CIB.Exchange.Cexio;
 using CIB.Exchange.Kraken;
 using CIB.Exchange.Model;
+using CIB.OrderManagement.WebUI.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace CIB.OrderManagement.WebUI
 {
@@ -32,8 +32,22 @@ namespace CIB.OrderManagement.WebUI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new StringEnumConverter());
+
             // Add framework services.
+            services.AddSignalR(options => options.JsonSerializerSettings = settings);
             services.AddMvc();
+
+            
+            //var settings = new JsonSerializerSettings();
+            //settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            //var serializer = JsonSerializer.Create(settings);
+            //services.Add(new ServiceDescriptor(typeof(JsonSerializer),
+            //             provider => serializer,
+            //             ServiceLifetime.Transient));
+
 
             services.AddSingleton<IOrderManagement>(s => new OrderManagementS(GetRoutes()));
         }
@@ -73,13 +87,18 @@ namespace CIB.OrderManagement.WebUI
             }
 
             app.UseStaticFiles();
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            app.UseWebSockets();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<OrdersHub>("orders");
+            });
+
         }
     }
 }

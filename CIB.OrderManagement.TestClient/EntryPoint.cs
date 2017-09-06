@@ -46,9 +46,9 @@ namespace CIB.OrderManagement.TestClient
         private static void Test(string name, IOrderManagement orderManagement, CurrencyPair tickr)
         {
             // buy 1 btc for 100 eur at kraken
-            var order1 = orderManagement.Create(name, tickr, Side.Bid, 1m, OrderType.Limit, 100m);
+            var order1 = orderManagement.Create(name, tickr, Side.Buy, 1m, OrderType.Limit, 100m);
             // buy 1 btc for 100 eur at kraken
-            var order2 = orderManagement.Create(name, tickr, Side.Bid, 0.01m, OrderType.Limit, 100m);
+            var order2 = orderManagement.Create(name, tickr, Side.Buy, 0.01m, OrderType.Limit, 100m);
             order1.StateNotifications().Subscribe(s => OnNewState(order1, s));
             order2.StateNotifications().Subscribe(s => OnNewState(order2, s));
             {

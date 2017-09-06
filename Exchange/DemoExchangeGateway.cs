@@ -51,7 +51,7 @@ namespace CIB.Exchange.Demo
         {
             Log.Info("[Demo mode]: order " + order.Pair.Ticker + " " + order.Volume + " @ " + order.Price);
 
-            if (order.Side == Side.Bid)
+            if (order.Side == Side.Buy)
             {
                 AddToBalance(order.Pair.Base, order.Volume);
                 AddToBalance(order.Pair.Quote, -order.Price * order.Volume);

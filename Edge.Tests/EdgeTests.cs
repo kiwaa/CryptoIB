@@ -74,8 +74,8 @@ namespace Edge.Tests
             edgeRunner.Run();
 
             // Assert
-            Order expectedSellOrder = new Order(pair, Side.Ask, 0.25020240m, OrderType.Limit, 192.87051m);
-            Order expectedBuyOrder = new Order(pair, Side.Bid, 0.25020240m, OrderType.Limit, 188.02748m);
+            Order expectedSellOrder = new Order(pair, Side.Sell, 0.25020240m, OrderType.Limit, 192.87051m);
+            Order expectedBuyOrder = new Order(pair, Side.Buy, 0.25020240m, OrderType.Limit, 188.02748m);
             exchange2.Received(1).AddOrder(expectedSellOrder);
             exchange1.Received(1).AddOrder(expectedBuyOrder);
         }
@@ -140,8 +140,8 @@ namespace Edge.Tests
             edgeRunner.Run();
 
             // Assert
-            Order expectedSellOrder = new Order(pair, Side.Ask, 0.875m, OrderType.Limit, 2406.36m);
-            Order expectedBuyOrder = new Order(pair, Side.Bid, 0.875m, OrderType.Limit, 2406.200m);
+            Order expectedSellOrder = new Order(pair, Side.Sell, 0.875m, OrderType.Limit, 2406.36m);
+            Order expectedBuyOrder = new Order(pair, Side.Buy, 0.875m, OrderType.Limit, 2406.200m);
             exchange1.Received(1).AddOrder(expectedSellOrder);
             exchange2.Received(1).AddOrder(expectedBuyOrder);
         }

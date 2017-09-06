@@ -236,9 +236,9 @@ namespace CIB.Exchange.Cexio
         {
             switch (orderSide)
             {
-                case Side.Bid:
+                case Side.Buy:
                     return "buy";
-                case Side.Ask:
+                case Side.Sell:
                     return "sell";
                 default:
                     Debug.Fail("Unkown type");

@@ -25,9 +25,9 @@ namespace CIB.Exchange.Kraken
         {
             switch (side)
             {
-                case Side.Bid:
+                case Side.Buy:
                     return "buy";
-                case Side.Ask:
+                case Side.Sell:
                     return "sell";
             }
             Debug.Fail("Unknown side");

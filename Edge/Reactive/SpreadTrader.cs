@@ -98,9 +98,9 @@ namespace CIB.Edge.Reactive
 
         private void TradePair(decimal volume, decimal limPriceShort, decimal limPriceLong)
         {
-            var sellOrder = new Order(_ticker, Side.Ask, volume, OrderType.Limit, limPriceShort);
+            var sellOrder = new Order(_ticker, Side.Sell, volume, OrderType.Limit, limPriceShort);
             _shortExchange.SendOrder(sellOrder);
-            var buyOrder = new Order(_ticker, Side.Bid, volume, OrderType.Limit, limPriceLong);
+            var buyOrder = new Order(_ticker, Side.Buy, volume, OrderType.Limit, limPriceLong);
             _longExchange.SendOrder(buyOrder);
         }
     }
