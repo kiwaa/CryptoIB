@@ -33,7 +33,6 @@ namespace CIB.OrderManagement.WebUI.Hubs
             {
                 order = _management.Create(orderDro.Exchange, currencyPair, orderDro.Side, orderDro.Volume, orderDro.Type, orderDro.Price.Value);
                 _storage.Add(order);
-                order.StateNotifications().Subscribe(x => OnNewState(order));
             }
             else
             {
@@ -42,11 +41,10 @@ namespace CIB.OrderManagement.WebUI.Hubs
             order.Send();
         }
 
-        private async void OnNewState(Order order)
+        public void Cancel(long id)
         {
-            var method = order.State == OrderState.New ? "New" : "Update";
-            await Clients.All.InvokeAsync(method, OrderDto.FromDomain(order));
+            var order = _storage.Get(id);
+            order.Cancel();
         }
-
     }
 }

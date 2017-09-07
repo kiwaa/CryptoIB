@@ -16,7 +16,8 @@ namespace CIB.OrderManagement.WebUI.Dto
                 Volume = order.Volume,
                 Type = order.Type,
                 Price = order.Price,
-                State = order.State
+                State = order.State,
+                Error = order.ErrorMessage
             };
         }
 
@@ -29,5 +30,6 @@ namespace CIB.OrderManagement.WebUI.Dto
         public OrderType Type { get; set; }
         public decimal? Price { get; set; }
         public OrderState State { get; set; }
+        public string Error { get; set; }
     }
 }

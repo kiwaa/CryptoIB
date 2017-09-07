@@ -90,7 +90,7 @@
             });
 
         connection.start();
-
+        
         $('#frm-new-order').submit((e) => {
             var order = {
                 exchange: $("#exchange").val(),
@@ -104,25 +104,30 @@
             e.preventDefault();
         });
 
+        $('#orders').on('click', '.cancel-order', (e) => {
+            var row = $(e.currentTarget).closest("tr[id^='order']");
+            var orderId = row.data("id");
+            console.log(orderId);
+            connection.invoke("Cancel", orderId);
+            e.preventDefault();
+        });
+
 
         function appendLine(order) {
 
-            var tr = $("<tr/>").attr("id", "order-" + order.Id).append(
-                $("<td/>").text(order.Id),
-                $("<td/>").text(order.Exchange),
-                $("<td/>").text(order.ExchangeOrderId),
-                $("<td/>").text(order.Currency + "/EUR"),
-                $("<td/>").text(order.Side + "/" + order.Type),
-                $("<td/>").text(order.Volume),
-                $("<td/>").text(order.Price),
-                $("<td/>").text(order.State)
-            );
+            var tr = buildRow(order);
             $("#orders").append(tr);
         };
 
         function replaceLine(order) {
 
-            var tr = $("<tr/>").attr("id", "order-" + order.Id).append(
+            var tr = buildRow(order);
+            $("#order-" + order.Id).replaceWith(tr);
+        };
+
+        function buildRow(order) {
+            var tr = $("<tr/>").attr("id", "order-" + order.Id)
+                .data("id", order.Id).append(
                 $("<td/>").text(order.Id),
                 $("<td/>").text(order.Exchange),
                 $("<td/>").text(order.ExchangeOrderId),
@@ -130,10 +135,23 @@
                 $("<td/>").text(order.Side + "/" + order.Type),
                 $("<td/>").text(order.Volume),
                 $("<td/>").text(order.Price),
-                $("<td/>").text(order.State)
-            );
-            $("#order-" + order.Id).replaceWith(tr);
-        };
+                $("<td/>").text(order.State + (order.Error ? ": " + order.Error : ""))
+                );
+
+
+            if (order.State === 'AcceptedByExchange') {
+                tr.append(
+                    $("<td/>").append(
+                        $("<a/>").addClass("cancel-order").attr("href", "#").text("X")
+                    )
+                );
+            } else {
+                tr.append(
+                    $("<td/>")
+                );
+            }
+            return tr;
+        }
 
     </script>
 }

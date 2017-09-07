@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CIB.Exchange;
 using CIB.Exchange.Cexio;
 using CIB.Exchange.Kraken;
@@ -40,25 +41,7 @@ namespace CIB.OrderManagement.WebUI
             services.AddMvc();
 
             services.AddSingleton<IOrderManagement>(s => new OrderManagementS(GetRoutes()));
-            services.AddSingleton(s => new OrderStorage());
-        }
-
-        private IDictionary<string, IReactiveExchangeGateway> GetRoutes()
-        {
-            var tickers = new CurrencyPair[]
-            {
-                new CurrencyPair("BTC", "EUR"),
-                new CurrencyPair("ETH", "EUR"),
-                //new CurrencyPair("LTC", "EUR")
-            };
-            return new Dictionary<string, IReactiveExchangeGateway>()
-                {
-                    {"Kraken", new DemoReactiveExchangeGateway(new ReactiveExchangeGatewayAdapter(new KrakenExchangeGateway(Configuration["kraken:key"], Configuration["kraken:secret"]), tickers))},
-                    {"CEX", new DemoReactiveExchangeGateway(new CexioReactiveExchangeGateway(Configuration["cexio:key"], Configuration["cexio:secret"], tickers))}
-                    //{"Kraken", new DemoReactiveExchangeGateway(new ReactiveExchangeGatewayAdapter(new KrakenExchangeGateway(Configuration["kraken:key"], Configuration["kraken:secret"]), tickers))},
-                    //{"CEX", new DemoReactiveExchangeGateway(new CexioReactiveExchangeGateway(Configuration["cexio:key"], Configuration["cexio:secret"], tickers))}
-                };
-
+            services.AddSingleton<OrderStorage>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,5 +74,42 @@ namespace CIB.OrderManagement.WebUI
             });
 
         }
+
+        private IDictionary<string, IReactiveExchangeGateway> GetRoutes()
+        {
+            var tickers = new CurrencyPair[]
+            {
+                new CurrencyPair("BTC", "EUR"),
+                new CurrencyPair("ETH", "EUR"),
+                //new CurrencyPair("LTC", "EUR")
+            };
+            return new Dictionary<string, IReactiveExchangeGateway>(new[]
+            {
+                CreateRoute("Kraken", tickers),
+                CreateRoute("CEX", tickers),
+            });
+        }
+
+        private KeyValuePair<string, IReactiveExchangeGateway> CreateRoute(string exchange, CurrencyPair[] tickers)
+        {
+            IReactiveExchangeGateway gateway = CreateExchangeGateway(exchange, tickers);
+            if (Configuration["demo"] == "false")
+                gateway = new DemoReactiveExchangeGateway(gateway);
+            return new KeyValuePair<string, IReactiveExchangeGateway>(exchange, gateway);
+        }
+
+        private IReactiveExchangeGateway CreateExchangeGateway(string exchange, CurrencyPair[] tickers)
+        {
+            switch (exchange)
+            {
+                case "Kraken":
+                    return new ReactiveExchangeGatewayAdapter(new KrakenExchangeGateway(Configuration["kraken:key"], Configuration["kraken:secret"]), tickers);
+                case "CEX":
+                    return new CexioReactiveExchangeGateway(Configuration["cexio:key"], Configuration["cexio:secret"], tickers);
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
     }
 }
