@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using CIB.Exchange.Model;
 using Newtonsoft.Json;
 
@@ -76,9 +77,12 @@ namespace CIB.Exchange
 
         public void AddOrder(Order order)
         {
-            var orderstatus = _gateaway.AddOrder(order);
-            _orderSubject.OnNext(orderstatus);
-            // update balance and so on
+            Task.Factory.StartNew(() =>
+            {
+                var orderstatus = _gateaway.AddOrder(order);
+                _orderSubject.OnNext(orderstatus);
+                // update balance and so on
+            });
         }
 
         public IObservable<OrderStatus> GetOrders()
@@ -88,8 +92,12 @@ namespace CIB.Exchange
 
         public void CancelOrder(Order order)
         {
-            var orderstatus = _gateaway.CancelOrder(order);
-            _orderSubject.OnNext(orderstatus);
+            Task.Factory.StartNew(() =>
+            {
+                var orderstatus = _gateaway.CancelOrder(order);
+                _orderSubject.OnNext(orderstatus);
+                // update balance and so on
+            });
         }
     }
 }
