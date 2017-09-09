@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CIB.Exchange.Model;
 using CIB.OrderManagement.WebUI.Dto;
+using CIB.OrderManagement.WebUI.Logic;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CIB.OrderManagement.WebUI.Hubs

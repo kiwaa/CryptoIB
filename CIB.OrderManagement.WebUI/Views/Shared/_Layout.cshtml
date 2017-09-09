@@ -28,7 +28,10 @@
         <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" asp-controller="Home">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="MarketData">Market Data</a>
                 </li>
             </ul>
         </div>
@@ -46,7 +49,6 @@
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="~/lib/popper.js/dist/umd/popper.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-    @*<script src="~/lib/signalr/jquery.signalr.js"></script>*@
     <script src="~/js/signalr-client.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 </environment>

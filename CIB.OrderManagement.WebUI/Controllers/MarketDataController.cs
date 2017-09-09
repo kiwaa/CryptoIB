@@ -2,15 +2,9 @@
 
 namespace CIB.OrderManagement.WebUI.Controllers
 {
-    public class HomeController : Controller
+    public class MarketDataController : Controller
     {
-
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Error()
         {
             return View();
         }

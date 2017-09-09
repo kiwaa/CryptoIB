@@ -264,7 +264,7 @@ namespace CIB.Exchange.Cexio
             _subscription?.Dispose();
         }
 
-        public string Name => "Cexio";
+        public string Name => "CEX";
         public IObservable<AccountBalance> GetBalance()
         {
             return _balanceSubject;

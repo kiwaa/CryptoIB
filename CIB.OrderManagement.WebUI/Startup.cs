@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CIB.Exchange;
 using CIB.Exchange.Cexio;
 using CIB.Exchange.Kraken;
 using CIB.Exchange.Model;
 using CIB.OrderManagement.WebUI.Hubs;
+using CIB.OrderManagement.WebUI.Logic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 namespace CIB.OrderManagement.WebUI
 {
@@ -40,7 +42,9 @@ namespace CIB.OrderManagement.WebUI
             services.AddSignalR(options => options.JsonSerializerSettings = settings);
             services.AddMvc();
 
-            services.AddSingleton<IOrderManagement>(s => new OrderManagementS(GetRoutes()));
+            var reactiveExchangeGateways = GetRoutes();
+            services.AddSingleton<IOrderManagement>(s => new OrderManagementS(reactiveExchangeGateways.ToDictionary(x => x.Name)));
+            services.AddSingleton(s => new MarketDataPublisher(reactiveExchangeGateways, s.GetService<IHubContext<QuotesHub>>()));
             services.AddSingleton<OrderStorage>();
         }
 
@@ -71,31 +75,29 @@ namespace CIB.OrderManagement.WebUI
             app.UseSignalR(routes =>
             {
                 routes.MapHub<OrdersHub>("orders");
+                routes.MapHub<QuotesHub>("quotes");
             });
-
+            app.ApplicationServices.GetService<MarketDataPublisher>();
         }
 
-        private IDictionary<string, IReactiveExchangeGateway> GetRoutes()
+        private IEnumerable<IReactiveExchangeGateway> GetRoutes()
         {
-            var tickers = new CurrencyPair[]
+            var tickers = new[]
             {
                 new CurrencyPair("BTC", "EUR"),
                 new CurrencyPair("ETH", "EUR"),
                 //new CurrencyPair("LTC", "EUR")
             };
-            return new Dictionary<string, IReactiveExchangeGateway>(new[]
-            {
-                CreateRoute("Kraken", tickers),
-                CreateRoute("CEX", tickers),
-            });
+            yield return CreateGateway("Kraken", tickers);
+            yield return CreateGateway("CEX", tickers);
         }
 
-        private KeyValuePair<string, IReactiveExchangeGateway> CreateRoute(string exchange, CurrencyPair[] tickers)
+        private IReactiveExchangeGateway CreateGateway(string exchange, CurrencyPair[] tickers)
         {
             IReactiveExchangeGateway gateway = CreateExchangeGateway(exchange, tickers);
             if (Configuration["demo"] == "false")
                 gateway = new DemoReactiveExchangeGateway(gateway);
-            return new KeyValuePair<string, IReactiveExchangeGateway>(exchange, gateway);
+            return gateway;
         }
 
         private IReactiveExchangeGateway CreateExchangeGateway(string exchange, CurrencyPair[] tickers)

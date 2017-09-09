@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewData["Title"] = "Market Data";
+}
+
+<div class="row" style="margin: 20px 0 20px 0">
+    <div class="table-responsive">
+        <table id="market-data" class="table table-striped ">
+            <tr>
+                <th>Status</th>
+                <th>Exchange</th>
+                <th>Pair</th>
+                <th>Bid</th>
+                <th>Ask</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var transportType = signalR.TransportType.WebSockets;
+        var http = new signalR.HttpConnection(`http://${document.location.host}/quotes`, { transport: transportType });
+
+        var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
+        var connection = new signalR.HubConnection(http);
+
+        connection.on('New',
+            (quote) => {
+                appendLine(quote);
+            });
+
+        connection.start();
+
+        function appendLine(quote) {
+            var tr = buildRow(quote);
+
+            var node = $("#" + getId(quote));
+            if (node.length) {
+                node.replaceWith(tr);
+            } else {
+                $("#market-data").append(tr);
+            }
+        };
+
+
+        function buildRow(quote) {
+            var tr = $("<tr/>").attr("id", getId(quote)).append(
+                $("<td/>").text(quote.Status),
+                $("<td/>").text(quote.Exchange),
+                $("<td/>").text(quote.Pair),
+                $("<td/>").text(quote.Bid),
+                $("<td/>").text(quote.Ask)
+            );
+            return tr;
+        }
+
+        function getId(quote) {
+            return (quote.Exchange + "-" + quote.Pair.replace("/", "-")).toLowerCase();
+        }
+
+    </script>
+}

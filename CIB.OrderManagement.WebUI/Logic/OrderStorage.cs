@@ -6,7 +6,7 @@ using CIB.OrderManagement.WebUI.Dto;
 using CIB.OrderManagement.WebUI.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
-namespace CIB.OrderManagement.WebUI
+namespace CIB.OrderManagement.WebUI.Logic
 {
     public class OrderStorage
     {
