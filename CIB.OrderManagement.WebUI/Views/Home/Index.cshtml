@@ -138,8 +138,7 @@
                 $("<td/>").text(order.State + (order.Error ? ": " + order.Error : ""))
                 );
 
-
-            if (order.State === 'AcceptedByExchange') {
+            if (order.CanCancel) {
                 tr.append(
                     $("<td/>").append(
                         $("<a/>").addClass("cancel-order").attr("href", "#").text("X")

@@ -52,7 +52,7 @@ namespace CIB.Exchange
             }
             VerifyBalance(balance);
             _balanceSubject.OnNext(balance);
-            _orderSubject.OnNext(new OrderStatus(order.Id, (_orderId++).ToString(), true));
+            _orderSubject.OnNext(new OrderStatus(order.Id, (_orderId++).ToString(), OrderState.Accepted));
         }
 
         private void VerifyBalance(AccountBalance balance)
@@ -120,7 +120,7 @@ namespace CIB.Exchange
             }
             VerifyBalance(balance);
             _balanceSubject.OnNext(balance);
-            _orderSubject.OnNext(new OrderStatus(order.Id, order.ExchangeOrderId, true, true));
+            _orderSubject.OnNext(new OrderStatus(order.Id, order.ExchangeOrderId, OrderState.Cancelled));
         }
     }
 }

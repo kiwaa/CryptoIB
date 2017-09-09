@@ -3,8 +3,10 @@
     public enum OrderState
     {
         New,
-        AcceptedByExchange,
         RejectedByExchange,
+        Accepted,
+        CancelPending,
+        CancelReject,
         Cancelled
     }
 }

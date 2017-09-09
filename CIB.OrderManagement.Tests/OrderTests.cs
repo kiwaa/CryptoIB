@@ -19,14 +19,14 @@ namespace CIB.OrderManagement.Tests
             // arrange
             var exchange = "Test";
             var fixture = new Fixture();
-            var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, Guid.NewGuid().ToString(), true));
+            var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, Guid.NewGuid().ToString(), OrderState.Accepted));
             var order = sut.Create(exchange, TestPair, Side.Buy, 1, OrderType.Limit, 100);
 
             // act
             order.Send();
 
             // assert
-            Assert.AreEqual(OrderState.AcceptedByExchange, order.State);
+            Assert.AreEqual(OrderState.Accepted, order.State);
         }
 
         [TestMethod]
@@ -35,7 +35,7 @@ namespace CIB.OrderManagement.Tests
             // arrange
             var exchange = "Test";
             var fixture = new Fixture();
-            var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, "No"));
+            var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, null, OrderState.RejectedByExchange, "No"));
             var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
 
             // act
@@ -53,8 +53,8 @@ namespace CIB.OrderManagement.Tests
             var exchange = "Test";
             var fixture = new Fixture();
             var sut = fixture.CreateSut(exchange, 
-                id => new OrderStatus(id, Guid.NewGuid().ToString(), true),
-                (id, eid) => new OrderStatus(id, eid, true, true));
+                id => new OrderStatus(id, Guid.NewGuid().ToString(), OrderState.Accepted),
+                (id, eid) => new OrderStatus(id, eid, OrderState.Cancelled));
             var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
             order.Send();
 
@@ -66,13 +66,31 @@ namespace CIB.OrderManagement.Tests
         }
 
         [TestMethod]
+        public void Send_CancelAcceptedLimitOrder_CancelPending()
+        {
+            // arrange
+            var exchange = "Test";
+            var fixture = new Fixture();
+            var sut = fixture.CreateSut(exchange,
+                id => new OrderStatus(id, Guid.NewGuid().ToString(), OrderState.Accepted));
+            var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
+            order.Send();
+
+            // act
+            order.Cancel();
+
+            // assert
+            Assert.AreEqual(OrderState.CancelPending, order.State);
+        }
+
+        [TestMethod]
         public void StateNotifications_Send_Notify()
         {
             // arrange
             bool wasCalled = false;
             var exchange = "Test";
             var fixture = new Fixture();
-            var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, Guid.NewGuid().ToString(), true));
+            var sut = fixture.CreateSut(exchange, id => new OrderStatus(id, Guid.NewGuid().ToString(), OrderState.Accepted));
             var order = sut.Create("Test", TestPair, Side.Buy, 1, OrderType.Limit, 100);
             order.StateNotifications().Subscribe(state => wasCalled = true);
             
@@ -95,11 +113,13 @@ namespace CIB.OrderManagement.Tests
                 exchange.GetOrders().Returns(ordersSubject);
                 exchange.When(e => e.AddOrder(Arg.Any<Order>())).Do(x =>
                 {
-                    ordersSubject.OnNext(onAdd(x.Arg<Order>().Id));
+                    if (onAdd != null)
+                        ordersSubject.OnNext(onAdd(x.Arg<Order>().Id));
                 });
                 exchange.When(e => e.CancelOrder(Arg.Any<Order>())).Do(x =>
                 {
-                    ordersSubject.OnNext(onCancel(x.Arg<Order>().Id, x.Arg<Order>().ExchangeOrderId));
+                    if (onCancel != null)
+                        ordersSubject.OnNext(onCancel(x.Arg<Order>().Id, x.Arg<Order>().ExchangeOrderId));
                 });
                 return new OrderManagementS(new Dictionary<string, IReactiveExchangeGateway>
                 {

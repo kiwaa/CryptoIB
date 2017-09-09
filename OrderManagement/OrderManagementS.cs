@@ -44,6 +44,7 @@ namespace CIB.OrderManagement
 
         public void Cancel(Order order)
         {
+            order.ApplyStatusChange(new OrderStatus(order.Id, order.ExchangeOrderId, OrderState.CancelPending));
             var exchange = GetExchange(order);
             exchange.CancelOrder(order);
         }

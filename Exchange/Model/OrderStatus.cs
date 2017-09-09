@@ -4,30 +4,19 @@
     {
         public long OrderId { get; set; }
         public string ExchangeOrderId { get; }
-        public bool AcceptedByExchange { get; }
         public string ErrorMessage { get; }
-        public bool IsCancelled { get; }
-
-        // accepted
-        public OrderStatus(long orderId, string exchangeOrderId, bool acceptedByExchange)
+        public OrderState NewState { get; }
+        
+        public OrderStatus(long orderId, string exchangeOrderId, OrderState state)
         {
             OrderId = orderId;
             ExchangeOrderId = exchangeOrderId;
-            AcceptedByExchange = acceptedByExchange;
+            NewState = state;
         }
 
-        // rejected
-        public OrderStatus(long orderId, string errorMessage)
+        public OrderStatus(long orderId, string exchangeOrderId, OrderState state, string errorMessage) : this(orderId, exchangeOrderId, state)
         {
-            OrderId = orderId;
-            AcceptedByExchange = false;
             ErrorMessage = errorMessage;
-        }
-
-        // cancelled
-        public OrderStatus(long orderId, string exchangeOrderId, bool acceptedByExchange, bool canceledByExchange) : this(orderId, exchangeOrderId, acceptedByExchange)
-        {
-            IsCancelled = canceledByExchange;
         }
     }
 }

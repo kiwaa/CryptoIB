@@ -64,7 +64,7 @@ namespace CIB.OrderManagement.TestClient
                 case OrderState.RejectedByExchange:
                     Console.WriteLine($"[{order.Exchange}] Order {order.Id} was not accepted by exchange" + (order.ErrorMessage != null ? ": " + order.ErrorMessage : ""));
                     break;
-                case OrderState.AcceptedByExchange:
+                case OrderState.Accepted:
                     Console.WriteLine($"[{order.Exchange}] Order {order.Id} accepted by exchange");
                     order.Cancel();
                     break;

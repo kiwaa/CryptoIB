@@ -113,7 +113,7 @@ namespace CIB.Exchange.Cexio
             Order order = null;
             if (!_request.TryRemove(oid, out order))
                 throw new NotImplementedException();
-            var orderStatus = ok ? new OrderStatus(order.Id, placement.id, true) : new OrderStatus(order.Id, placement.error);
+            var orderStatus = ok ? new OrderStatus(order.Id, placement.id, OrderState.Accepted) : new OrderStatus(order.Id, null, OrderState.RejectedByExchange, placement.error);
             _ordersSubject.OnNext(orderStatus);
         }
 
@@ -122,7 +122,7 @@ namespace CIB.Exchange.Cexio
             Order order = null;
             if (!_request.TryRemove(oid, out order))
                 throw new NotImplementedException();
-            var orderStatus = new OrderStatus(order.Id, placement.order_id, true, ok);
+            var orderStatus = ok ? new OrderStatus(order.Id, placement.order_id, OrderState.Cancelled) : new OrderStatus(order.Id, placement.order_id, OrderState.CancelReject, placement.error);
             _ordersSubject.OnNext(orderStatus);
         }
 

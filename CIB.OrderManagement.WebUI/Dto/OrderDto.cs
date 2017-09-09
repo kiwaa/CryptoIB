@@ -31,5 +31,7 @@ namespace CIB.OrderManagement.WebUI.Dto
         public decimal? Price { get; set; }
         public OrderState State { get; set; }
         public string Error { get; set; }
+
+        public bool CanCancel => State == OrderState.Accepted || State == OrderState.CancelReject;
     }
 }

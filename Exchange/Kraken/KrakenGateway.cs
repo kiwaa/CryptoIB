@@ -140,17 +140,17 @@ namespace CIB.Exchange.Kraken
                 {
                     Debug.Assert(result.result.txid.Length == 1);
                     order.ExchangeOrderId = result.result.txid[0];
-                    return new OrderStatus(order.Id, result.result.txid[0], true);
+                    return new OrderStatus(order.Id, result.result.txid[0], OrderState.Accepted);
                 }
                 else
                 {
                     Debug.Assert(result.error.Count == 1);
-                    return new OrderStatus(order.Id, result.error[0]);
+                    return new OrderStatus(order.Id, null, OrderState.RejectedByExchange, result.error[0]);
                 }
             }
             catch (Exception e)
             {
-                return new OrderStatus(order.Id, null);
+                return new OrderStatus(order.Id, null, OrderState.RejectedByExchange);
             }
 
             throw new NotImplementedException();
@@ -259,17 +259,17 @@ namespace CIB.Exchange.Kraken
                 if (result.error.Count == 0)
                 {
                     Debug.Assert(result.result.count == 1);
-                    return new OrderStatus(order.Id, order.ExchangeOrderId, true, result.result.count > 0);
+                    return new OrderStatus(order.Id, order.ExchangeOrderId, OrderState.Cancelled);
                 }
                 else
                 {
                     Debug.Assert(result.error.Count == 1);
-                    return new OrderStatus(order.Id, result.error[0]);
+                    return new OrderStatus(order.Id, order.ExchangeOrderId, OrderState.CancelReject, result.error[0]);
                 }
             }
             catch (Exception e)
             {
-                return new OrderStatus(order.Id, null);
+                return new OrderStatus(order.Id, order.ExchangeOrderId, OrderState.CancelReject);
             }
 
             throw new NotImplementedException();

@@ -63,7 +63,7 @@ namespace CIB.Exchange.Demo
             }
             VerifyBalance();
 
-            return new OrderStatus(order.Id, (_orderId++).ToString(), true);
+            return new OrderStatus(order.Id, (_orderId++).ToString(), OrderState.Accepted);
         }
 
         private void VerifyBalance()
