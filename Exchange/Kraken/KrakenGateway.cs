@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using CIB.Exchange.Kraken.DTO;
 using CIB.Exchange.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OrderBookDto = CIB.Exchange.Kraken.DTO.OrderBookDto;
 
 namespace CIB.Exchange.Kraken
@@ -19,6 +20,7 @@ namespace CIB.Exchange.Kraken
         private const string ApiUrl = "https://api.kraken.com";
         private const string TimeApi = "/0/public/Time";
         private const string TickerApi = "/0/public/pair";
+        private const string OhlcApi = "0/public/OHLC";
         private const string OrderBookApi = "/0/public/Depth";
         private const string AddOrderApi = "/0/private/AddOrder";
         private const string CancelOrderApi = "/0/private/CancelOrder";
@@ -38,6 +40,7 @@ namespace CIB.Exchange.Kraken
 
         public KrakenExchangeGateway()
         {
+            _client = CreateHttpClient();
         }
 
         public KrakenExchangeGateway(string key, string secret)
@@ -61,6 +64,32 @@ namespace CIB.Exchange.Kraken
                 return ToDomain(tickers, result.result).ToList();
             }
             throw new NotImplementedException();
+        }
+
+        public List<OHLC> GetOhlc(CurrencyPair ticker, int interval)
+        {
+            var convertTicker = KrakenConverters.ConvertTicker(ticker);
+            var reqs = "pair=" + convertTicker + "&interval=" + interval;
+            var json = CallApi(OhlcApi, reqs, HttpMethod.Get).Result;
+            var result = JsonConvert.DeserializeObject<RootObjectDto<object>>(json);
+
+            if (result.error.Count == 0)
+            {
+                return ToDomain(ticker, result.result).ToList();
+            }
+            throw new NotImplementedException();
+        }
+
+        private IEnumerable<OHLC> ToDomain(CurrencyPair ticker, Dictionary<string, object> result)
+        {
+            var convertTicker = KrakenConverters.ConvertTicker(ticker);
+            var jarray = result[convertTicker] as JArray;
+            var data = jarray.ToObject<string[][]>();
+            foreach (var d in data)
+            {
+                var timestamp = DateTimeUtilities.FromUnixTimestamp(long.Parse(d[0]));
+                yield return new OHLC(Name, ticker, timestamp, decimal.Parse(d[1]), decimal.Parse(d[2]), decimal.Parse(d[3]), decimal.Parse(d[4])); 
+            }
         }
 
         private IEnumerable<Quote> ToDomain(IEnumerable<CurrencyPair> tickers, Dictionary<string, QuoteDto> resultResult)

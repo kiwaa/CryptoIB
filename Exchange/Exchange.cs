@@ -18,6 +18,8 @@ namespace CIB.Exchange
         private readonly Dictionary<CurrencyPair, OrderBook> _orderBooks = new Dictionary<CurrencyPair, OrderBook>();
         private AccountBalance _balance = new AccountBalance();
 
+        public string Name => _reactiveExchangeGateway.Name;
+
         public Exchange(IReactiveExchangeGateway reactiveExchangeGateway)
         {
             if (reactiveExchangeGateway == null) throw new ArgumentNullException(nameof(reactiveExchangeGateway));

@@ -3,6 +3,8 @@
     ViewData["Title"] = "Market Data";
 }
 
+<div id="chart"></div>
+
 <div class="row" style="margin: 20px 0 20px 0">
     <div class="table-responsive">
         <table id="market-data" class="table table-striped ">
@@ -20,7 +22,12 @@
 
 
 @section Scripts {
+    <script src="~/lib/d3/d3.js"></script>
+    <script src="~/lib/techan/dist/techan.js"></script>
+    <script src="~/js/candlestick.js" asp-append-version="true"></script>
+
     <script>
+        var ohlc = [];
         var transportType = signalR.TransportType.WebSockets;
         var http = new signalR.HttpConnection(`http://${document.location.host}/quotes`, { transport: transportType });
 
@@ -28,8 +35,36 @@
         var connection = new signalR.HubConnection(http);
 
         connection.on('New',
-            (quote) => {
-                appendLine(quote);
+            (data) => {
+                if (data.Quote) {
+                    appendLine(data.Quote);
+                }
+
+                if (data.Ohlc) {
+                    var d = {
+                        date: new Date(data.Ohlc.Date),
+                        open: data.Ohlc.Open,
+                        high: data.Ohlc.High,
+                        low: data.Ohlc.Low,
+                        close: data.Ohlc.Close
+                    };
+                    ohlc.push(d);
+                    draw(ohlc);
+                }
+            });
+
+        connection.on('List',
+            (data) => {
+                ohlc = data.map(d => {
+                    return {
+                        date: new Date(d.Date),
+                        open: d.Open,
+                        high: d.High,
+                        low: d.Low,
+                        close: d.Close
+                    }
+                });
+                init(ohlc);
             });
 
         connection.start();

@@ -16,7 +16,7 @@ namespace CIB.OrderManagement.WebUI.Logic
     {
         private readonly IHubContext<QuotesHub> _quotesHub;
         private IDisposable _allSubscription;
-
+        
         public MarketDataPublisher(IEnumerable<IReactiveExchangeGateway> gateways, IHubContext<QuotesHub> quotesHub)
         {
             _quotesHub = quotesHub;
@@ -30,17 +30,43 @@ namespace CIB.OrderManagement.WebUI.Logic
             foreach (var exchange in exchanges)
             {
                 exchange.Subscribe();
-                var disposable = exchange.GetMarketData()
+                var disposable1 = exchange.GetMarketData()
                     .DistinctUntilChanged(new QuoteValueComparer(QuoteValueComparer.PriceComparison.BidAndAsk))
                     .Subscribe(OnQuote);
-                subscriptions.Add(disposable);
+
+                if (exchange.Name == "Kraken")
+                {
+                    var disposable2 = exchange.GetMarketData()
+                        .Where(x => x.Pair.Ticker == "BTC/EUR")
+                        .DistinctUntilChanged(new QuoteValueComparer(QuoteValueComparer.PriceComparison.BidAndAsk))
+                        .Buffer(TimeSpan.FromMinutes(1))
+                        .Select(x => new OHLC(
+                                x.First().Exchange,
+                                x.First().Pair,
+                                x.First().TimestampUtc,
+                                // instead of bid, should be 'last trade'
+                                x.First().Bid,
+                                x.Max(_ => _.Bid),
+                                x.Min(_ => _.Bid),
+                                x.Last().Bid
+                            ))
+                        .Subscribe(OnOhlc);
+                    subscriptions.Add(disposable2);
+                }
+                subscriptions.Add(disposable1);
             }
             _allSubscription = new CompositeDisposable(subscriptions);
         }
 
+        private async void OnOhlc(OHLC ohlc)
+        {
+            var dto = new MarketDataDto() { Quote = null, Ohlc = OhlcDto.FromDomain(ohlc) };
+            await _quotesHub.Clients.All.InvokeAsync("New", dto);
+        }
+
         private async void OnQuote(Quote quote)
         {
-            var dto = QuoteDto.FromDomain(quote);
+            var dto = new MarketDataDto() { Quote = QuoteDto.FromDomain(quote), Ohlc = null };
             await _quotesHub.Clients.All.InvokeAsync("New", dto);
         }
 

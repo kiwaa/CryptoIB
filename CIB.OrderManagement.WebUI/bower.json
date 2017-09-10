@@ -6,9 +6,12 @@
     "jquery-validation": "1.14.0",
     "jquery-validation-unobtrusive": "3.2.6",
     "bootstrap": "v4.0.0-beta",
-    "signalr": "v2.2.2"
+    "signalr": "v2.2.2",
+    "d3": "v4.10.2",
+    "techan": "0.8.0"
   },
   "resolutions": {
-    "bootstrap": "v4.0.0-beta"
+    "bootstrap": "v4.0.0-beta",
+    "d3": "v4.10.2"
   }
 }
